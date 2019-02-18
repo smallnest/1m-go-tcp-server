@@ -47,7 +47,7 @@ func main() {
 	log.Printf("连接到 %s", addr)
 
 	for i := 0; i < *c; i++ {
-		mkConn(addr, *connections/(*c))
+		go mkConn(addr, *connections/(*c))
 	}
 
 	select {}
