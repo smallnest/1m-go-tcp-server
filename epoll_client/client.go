@@ -36,6 +36,12 @@ func main() {
 	setLimit()
 	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 
+	var err error
+	epoller, err = MkEpoll()
+	if err != nil {
+		panic(err)
+	}
+
 	addr := *ip + ":8972"
 	log.Printf("连接到 %s", addr)
 	var conns []net.Conn
