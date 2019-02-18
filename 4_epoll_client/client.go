@@ -100,7 +100,7 @@ func start() {
 				opsRate.Update(time.Duration(time.Now().UnixNano() - nano))
 			}
 
-			err = binary.Write(conn, binary.BigEndian, []byte("hello world\r\n"))
+			err = binary.Write(conn, binary.BigEndian, time.Now().UnixNano())
 			if err != nil {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)

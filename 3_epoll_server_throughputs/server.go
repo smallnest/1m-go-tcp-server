@@ -1,13 +1,12 @@
 package main
 
 import (
-	"encoding/binary"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"syscall"
-	"time"
 )
 
 var epoller *epoll
@@ -53,7 +52,6 @@ func main() {
 }
 
 func start() {
-	var buf = make([]byte, 1024)
 	for {
 		connections, err := epoller.Wait()
 		if err != nil {
@@ -64,13 +62,8 @@ func start() {
 			if conn == nil {
 				break
 			}
-			if _, err := conn.Read(buf); err != nil {
-				if err := epoller.Remove(conn); err != nil {
-					log.Printf("failed to remove %v", err)
-				}
-			}
 
-			err = binary.Write(conn, binary.BigEndian, time.Now().UnixNano())
+			_, err = io.CopyN(conn, conn, 8)
 			if err != nil {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)

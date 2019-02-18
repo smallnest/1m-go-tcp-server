@@ -1,20 +1,19 @@
 package main
 
 import (
-	"encoding/binary"
 	"flag"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"syscall"
-	"time"
 
 	"github.com/libp2p/go-reuseport"
 )
 
 var (
-	c = flag.Int("c", 100, "concurrency")
+	c = flag.Int("c", 10, "concurrency")
 )
 
 func main() {
@@ -68,7 +67,6 @@ func startEpoll() {
 }
 
 func start(epoller *epoll) {
-	var buf = make([]byte, 1024)
 	for {
 		connections, err := epoller.Wait()
 		if err != nil {
@@ -79,13 +77,8 @@ func start(epoller *epoll) {
 			if conn == nil {
 				break
 			}
-			if _, err := conn.Read(buf); err != nil {
-				if err := epoller.Remove(conn); err != nil {
-					log.Printf("failed to remove %v", err)
-				}
-			}
 
-			err = binary.Write(conn, binary.BigEndian, time.Now().UnixNano())
+			io.CopyN(conn, conn, 8)
 			if err != nil {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
