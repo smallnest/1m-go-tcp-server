@@ -11,5 +11,5 @@ IP=$3
 go build --tags "static netgo" -o client client.go
 for (( c=0; c<${REPLICAS}; c++ ))
 do
-    docker run -v $(pwd)/client:/client --name 1mclient_$c -d alpine /client -conn=${CONNECTIONS} -ip=${IP}
+    docker run -v $(pwd)/client:/client --name 1mclient_$c -d frolvlad/alpine-glibc /client -conn=${CONNECTIONS} -ip=${IP}
 done
