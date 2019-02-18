@@ -92,26 +92,28 @@ func start() {
 			log.Printf("failed to epoll wait %v", err)
 			continue
 		}
-		for _, conn := range connections {
-			if conn == nil {
-				break
-			}
-
-			if err := binary.Read(conn, binary.BigEndian, &nano); err != nil {
-				if err := epoller.Remove(conn); err != nil {
-					log.Printf("failed to remove %v", err)
+		go func() {
+			for _, conn := range connections {
+				if conn == nil {
+					break
 				}
-			} else {
-				opsRate.Update(time.Duration(time.Now().UnixNano() - nano))
-			}
 
-			err = binary.Write(conn, binary.BigEndian, []byte("hello world\r\n"))
-			if err != nil {
-				if err := epoller.Remove(conn); err != nil {
-					log.Printf("failed to remove %v", err)
+				if err := binary.Read(conn, binary.BigEndian, &nano); err != nil {
+					if err := epoller.Remove(conn); err != nil {
+						log.Printf("failed to remove %v", err)
+					}
+				} else {
+					opsRate.Update(time.Duration(time.Now().UnixNano() - nano))
+				}
+
+				err = binary.Write(conn, binary.BigEndian, []byte("hello world\r\n"))
+				if err != nil {
+					if err := epoller.Remove(conn); err != nil {
+						log.Printf("failed to remove %v", err)
+					}
 				}
 			}
-		}
+		}()
 	}
 }
 
