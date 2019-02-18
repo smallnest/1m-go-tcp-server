@@ -16,7 +16,8 @@ import (
 
 var (
 	ip          = flag.String("ip", "127.0.0.1", "server IP")
-	connections = flag.Int("conn", 1, "number of tcp connections")
+	connections = flag.Int("conn", 1, "number of total tcp connections")
+	c           = flag.Int("c", 100, "currency count")
 )
 
 var (
@@ -44,8 +45,17 @@ func main() {
 
 	addr := *ip + ":8972"
 	log.Printf("连接到 %s", addr)
+
+	for i := 0; i < *c; i++ {
+		mkConn(addr, *connections/(*c))
+	}
+
+	select {}
+}
+
+func mkConn(addr string, connections int) {
 	var conns []net.Conn
-	for i := 0; i < *connections; i++ {
+	for i := 0; i < connections; i++ {
 		c, err := net.DialTimeout("tcp", addr, 10*time.Second)
 		if err != nil {
 			fmt.Println("failed to connect", i, err)
@@ -61,24 +71,15 @@ func main() {
 
 	log.Printf("完成初始化 %d 连接", len(conns))
 
-	tts := time.Second
-	if *connections > 100 {
-		tts = time.Millisecond * 5
-	}
-
-	go start()
+	go start(epoller)
 
 	for i := 0; i < len(conns); i++ {
-		time.Sleep(tts)
 		conn := conns[i]
-		//log.Printf("连接 %d 发送数据", i)
 		conn.Write([]byte("hello world\r\n"))
 	}
-
-	select {}
 }
 
-func start() {
+func start(epoller *epoll) {
 	var nano int64
 	for {
 		connections, err := epoller.Wait()
@@ -105,7 +106,6 @@ func start() {
 					if err := epoller.Remove(conn); err != nil {
 						log.Printf("failed to remove %v", err)
 					}
-					conn.Close()
 				}
 			}
 		}()
