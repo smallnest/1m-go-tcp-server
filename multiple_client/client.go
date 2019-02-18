@@ -23,7 +23,6 @@ var (
 var (
 	opsRate = metrics.NewRegisteredTimer("ops", nil)
 )
-var epoller *epoll
 
 // client采用epoll方式，但是会多线程的处理
 func main() {
@@ -38,23 +37,22 @@ func main() {
 	setLimit()
 	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 
-	var err error
-	epoller, err = MkEpoll()
-	if err != nil {
-		panic(err)
-	}
-
 	addr := *ip + ":8972"
 	log.Printf("连接到 %s", addr)
 
 	for i := 0; i < *c; i++ {
-		go mkConn(addr, *connections/(*c))
+		go mkClient(addr, *connections/(*c))
 	}
 
 	select {}
 }
 
-func mkConn(addr string, connections int) {
+func mkClient(addr string, connections int) {
+	epoller, err := MkEpoll()
+	if err != nil {
+		panic(err)
+	}
+
 	var conns []net.Conn
 	for i := 0; i < connections; i++ {
 		c, err := net.DialTimeout("tcp", addr, 10*time.Second)
