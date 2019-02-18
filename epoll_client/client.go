@@ -24,6 +24,7 @@ var (
 )
 var epoller *epoll
 
+// client改造成epoll方式, 处理epoll消息是单线程的
 func main() {
 	flag.Usage = func() {
 		io.WriteString(os.Stderr, `tcp客户端测试工具
@@ -86,29 +87,27 @@ func start() {
 			log.Printf("failed to epoll wait %v", err)
 			continue
 		}
-		go func() {
-			for _, conn := range connections {
-				if conn == nil {
-					break
-				}
-
-				if err := binary.Read(conn, binary.BigEndian, &nano); err != nil {
-					if err := epoller.Remove(conn); err != nil {
-						log.Printf("failed to remove %v", err)
-					}
-				} else {
-					opsRate.Update(time.Duration(time.Now().UnixNano() - nano))
-				}
-
-				err = binary.Write(conn, binary.BigEndian, []byte("hello world\r\n"))
-				if err != nil {
-					if err := epoller.Remove(conn); err != nil {
-						log.Printf("failed to remove %v", err)
-					}
-					conn.Close()
-				}
+		for _, conn := range connections {
+			if conn == nil {
+				break
 			}
-		}()
+
+			if err := binary.Read(conn, binary.BigEndian, &nano); err != nil {
+				if err := epoller.Remove(conn); err != nil {
+					log.Printf("failed to remove %v", err)
+				}
+			} else {
+				opsRate.Update(time.Duration(time.Now().UnixNano() - nano))
+			}
+
+			err = binary.Write(conn, binary.BigEndian, []byte("hello world\r\n"))
+			if err != nil {
+				if err := epoller.Remove(conn); err != nil {
+					log.Printf("failed to remove %v", err)
+				}
+				conn.Close()
+			}
+		}
 	}
 }
 
