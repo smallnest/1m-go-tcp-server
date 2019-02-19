@@ -8,8 +8,11 @@
 CONNECTIONS=$1
 REPLICAS=$2
 IP=$3
-go build --tags "static netgo" -o client client.go
+#go build --tags "static netgo" -o client client.go
+
+DATE=`date -d "+5 minutes" +"%FT%T"`
 for (( c=0; c<${REPLICAS}; c++ ))
 do
-    docker run -v $(pwd)/client:/client --name 1mclient_$c -d frolvlad/alpine-glibc /client -conn=${CONNECTIONS} -ip=${IP}
+    docker run -v $(pwd)/client:/client --name 1mclient_$c -d frolvlad/alpine-glibc /client \
+    -conn=${CONNECTIONS} -ip=${IP} -sm ${DATE}
 done

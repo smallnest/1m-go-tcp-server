@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"os"
@@ -18,7 +17,7 @@ var (
 	ip          = flag.String("ip", "127.0.0.1", "server IP")
 	connections = flag.Int("conn", 1, "number of total tcp connections")
 	c           = flag.Int("c", 100, "currency count")
-	startMetric = flag.String("sm", time.Now().Format("2006-01-02T15:04"), "start time point of all clients")
+	startMetric = flag.String("sm", time.Now().Format("2006-01-02T15:04:05"), "start time point of all clients")
 )
 
 var (
@@ -27,12 +26,6 @@ var (
 
 // client采用epoll方式，但是会多线程的处理
 func main() {
-	flag.Usage = func() {
-		io.WriteString(os.Stderr, `tcp客户端测试工具
-使用方法: ./client -ip=172.17.0.1 -conn=10
-`)
-		flag.PrintDefaults()
-	}
 	flag.Parse()
 
 	setLimit()

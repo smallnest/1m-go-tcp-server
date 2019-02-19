@@ -10,7 +10,10 @@ REPLICAS=$2
 IP=$3
 CONCURRENCY=$4
 
+DATE=`date -d "+5 minutes" +"%FT%T"`
+
 for (( c=0; c<${REPLICAS}; c++ ))
 do
-    docker run -v $(pwd)/mclient:/client --name 1mclient_$c -d frolvlad/alpine-glibc /client -conn=${CONNECTIONS} -ip=${IP} -c=${CONCURRENCY}
+    docker run -v $(pwd)/mclient:/client --name 1mclient_$c -d frolvlad/alpine-glibc /client \
+    -conn=${CONNECTIONS} -ip=${IP} -c=${CONCURRENCY} -sm ${DATE}
 done
