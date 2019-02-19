@@ -6,13 +6,22 @@ import (
 	"net"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"syscall"
+	"time"
+
+	"github.com/rcrowley/go-metrics"
+)
+
+var (
+	opsRate = metrics.NewRegisteredMeter("ops", nil)
 )
 
 var epoller *epoll
 
 func main() {
 	setLimit()
+	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 
 	ln, err := net.Listen("tcp", ":8972")
 	if err != nil {
@@ -70,6 +79,8 @@ func start() {
 					log.Printf("failed to remove %v", err)
 				}
 			}
+
+			opsRate.Mark(1)
 		}
 	}
 }

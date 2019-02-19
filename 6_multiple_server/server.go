@@ -7,19 +7,27 @@ import (
 	"net"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"syscall"
+	"time"
 
 	"github.com/libp2p/go-reuseport"
+	"github.com/rcrowley/go-metrics"
 )
 
 var (
 	c = flag.Int("c", 10, "concurrency")
 )
 
+var (
+	opsRate = metrics.NewRegisteredMeter("ops", nil)
+)
+
 func main() {
 	flag.Parse()
 
 	setLimit()
+	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 
 	go func() {
 		if err := http.ListenAndServe(":6060", nil); err != nil {
@@ -77,13 +85,14 @@ func start(epoller *epoll) {
 			if conn == nil {
 				break
 			}
-
 			io.CopyN(conn, conn, 8)
 			if err != nil {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
 				}
 			}
+
+			opsRate.Mark(1)
 		}
 	}
 }
