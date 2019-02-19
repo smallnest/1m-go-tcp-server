@@ -31,7 +31,10 @@ func main() {
 	setLimit()
 
 	go func() {
-		startPoint, _ := time.Parse(*startMetric, "startMetric")
+		startPoint, err := time.Parse(*startMetric, "2006-01-02T15:04:05")
+		if err != nil {
+			panic(err)
+		}
 		time.Sleep(startPoint.Sub(time.Now()))
 
 		metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
