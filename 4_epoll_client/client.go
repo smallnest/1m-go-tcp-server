@@ -31,7 +31,7 @@ func main() {
 	setLimit()
 
 	go func() {
-		startPoint, err := time.Parse(*startMetric, "2006-01-02T15:04:05")
+		startPoint, err := time.Parse("2006-01-02T15:04:05", *startMetric)
 		if err != nil {
 			panic(err)
 		}
