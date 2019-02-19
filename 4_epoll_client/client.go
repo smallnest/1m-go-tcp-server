@@ -98,15 +98,20 @@ func start() {
 			}
 
 			if err := binary.Read(conn, binary.BigEndian, &nano); err != nil {
+				log.Printf("failed to read %v", err)
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
 				}
+
+				conn.Close()
+				continue
 			} else {
 				opsRate.Update(time.Duration(time.Now().UnixNano() - nano))
 			}
 
 			err = binary.Write(conn, binary.BigEndian, time.Now().UnixNano())
 			if err != nil {
+				log.Printf("failed to write %v", err)
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
 				}
