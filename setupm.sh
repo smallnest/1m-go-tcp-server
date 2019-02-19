@@ -8,8 +8,9 @@
 CONNECTIONS=$1
 REPLICAS=$2
 IP=$3
-go build --tags "static netgo" -o client client.go
+CONCURRENCY=$4
+
 for (( c=0; c<${REPLICAS}; c++ ))
 do
-    docker run -v $(pwd)/client:/client --name 1mclient_$c -d frolvlad/alpine-glibc /client -conn=${CONNECTIONS} -ip=${IP}
+    docker run -v $(pwd)/mclient:/client --name 1mclient_$c -d frolvlad/alpine-glibc /client -conn=${CONNECTIONS} -ip=${IP} -c=${CONCURRENCY}
 done

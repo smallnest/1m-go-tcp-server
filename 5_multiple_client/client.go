@@ -72,10 +72,23 @@ func mkClient(addr string, connections int) {
 
 	go start(epoller)
 
-	for i := 0; i < len(conns); i++ {
-		conn := conns[i]
-		conn.Write([]byte("hello world\r\n"))
+	tts := time.Second
+	if *c > 100 {
+		tts = time.Millisecond * 5
 	}
+
+	for i := 0; i < len(conns); i++ {
+		time.Sleep(tts)
+		conn := conns[i]
+		err = binary.Write(conn, binary.BigEndian, time.Now().UnixNano())
+		if err := epoller.Remove(conn); err != nil {
+			log.Printf("failed to write timestamp %v", err)
+			if err := epoller.Remove(conn); err != nil {
+				log.Printf("failed to remove %v", err)
+			}
+		}
+	}
+
 }
 
 func start(epoller *epoll) {
@@ -99,7 +112,7 @@ func start(epoller *epoll) {
 				opsRate.Update(time.Duration(time.Now().UnixNano() - nano))
 			}
 
-			err = binary.Write(conn, binary.BigEndian, []byte("hello world\r\n"))
+			err = binary.Write(conn, binary.BigEndian, time.Now().UnixNano())
 			if err != nil {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
