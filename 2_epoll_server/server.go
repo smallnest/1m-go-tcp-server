@@ -51,7 +51,7 @@ func main() {
 }
 
 func start() {
-	var buf = make([]byte, 1024)
+	var buf = make([]byte, 8)
 	for {
 		connections, err := epoller.Wait()
 		if err != nil {

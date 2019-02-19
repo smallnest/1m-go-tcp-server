@@ -38,6 +38,7 @@ func main() {
 			continue
 		}
 		conns = append(conns, c)
+		time.Sleep(time.Millisecond)
 	}
 
 	defer func() {
