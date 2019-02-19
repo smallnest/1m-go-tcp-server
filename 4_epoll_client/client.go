@@ -17,6 +17,7 @@ import (
 var (
 	ip          = flag.String("ip", "127.0.0.1", "server IP")
 	connections = flag.Int("conn", 1, "number of tcp connections")
+	startMetric = flag.String("sm", time.Now().Format("2006-01-02T15:04"), "start time point of all clients")
 )
 
 var (
@@ -35,7 +36,13 @@ func main() {
 	flag.Parse()
 
 	setLimit()
-	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
+
+	go func() {
+		startPoint, _ := time.Parse(*startMetric, "startMetric")
+		time.Sleep(startPoint.Sub(time.Now()))
+
+		metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
+	}()
 
 	var err error
 	epoller, err = MkEpoll()
