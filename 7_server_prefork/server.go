@@ -8,8 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
-
-	reuseport "github.com/kavu/go_reuseport"
 )
 
 var (
@@ -29,7 +27,7 @@ func main() {
 	if *prefork {
 		ln = doPrefork()
 	} else {
-		ln, err = reuseport.Listen("tcp", ":8972")
+		ln, err = net.Listen("tcp", ":8972")
 		if err != nil {
 			panic(err)
 		}
