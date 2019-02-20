@@ -123,6 +123,7 @@ func start(epoller *epoll) {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
 				}
+				conn.Close()
 			}
 		}
 	}
