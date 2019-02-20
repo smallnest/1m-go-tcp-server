@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -66,7 +65,7 @@ func main() {
 }
 
 func handleConn(conn net.Conn) {
-	io.Copy(ioutil.Discard, conn)
+	io.Copy(conn, conn)
 }
 
 func setLimit() {
