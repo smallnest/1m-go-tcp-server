@@ -25,7 +25,7 @@ func main() {
 	var err error
 
 	if *prefork {
-		ln = doPrefork()
+		ln = doPrefork(*c)
 	} else {
 		ln, err = net.Listen("tcp", ":8972")
 		if err != nil {
@@ -65,7 +65,7 @@ func startEpoll(ln net.Listener) {
 	}
 }
 
-func doPrefork() net.Listener {
+func doPrefork(c int) net.Listener {
 	var listener net.Listener
 	if !*child {
 		addr, err := net.ResolveTCPAddr("tcp", ":8972")
@@ -80,7 +80,7 @@ func doPrefork() net.Listener {
 		if err != nil {
 			log.Fatal(err)
 		}
-		children := make([]*exec.Cmd, *c)
+		children := make([]*exec.Cmd, c)
 		for i := range children {
 			children[i] = exec.Command(os.Args[0], "-prefork", "-child")
 			children[i].Stdout = os.Stdout
