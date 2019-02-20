@@ -65,7 +65,16 @@ func main() {
 }
 
 func handleConn(conn net.Conn) {
-	io.Copy(conn, conn)
+	for {
+		_, err := io.CopyN(conn, conn, 8)
+		if err != nil {
+			log.Printf("failed to copy: %v", err)
+			conn.Close()
+			return
+		}
+		opsRate.Mark(1)
+	}
+
 }
 
 func setLimit() {
