@@ -41,6 +41,7 @@ func main() {
 	}()
 
 	workerPool = newPool(*c, 1000000)
+	workerPool.start()
 
 	epoller, err = MkEpoll()
 	if err != nil {

@@ -59,7 +59,6 @@ func (p *pool) startWorker() {
 		case conn := <-p.taskQueue:
 			if conn != nil {
 				handleConn(conn)
-
 			}
 		}
 	}
