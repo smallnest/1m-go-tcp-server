@@ -8,12 +8,10 @@
 CONNECTIONS=$1
 REPLICAS=$2
 IP=$3
-CONCURRENCY=$4
-
-DATE=`date -d "+2 minutes" +"%FT%T %z"`
+#go build --tags "static netgo" -o client client.go
 
 for (( c=0; c<${REPLICAS}; c++ ))
 do
-    docker run -v $(pwd)/mclient:/client --name 1mclient_$c -d alpine /client \
-    -conn=${CONNECTIONS} -ip=${IP} -c=${CONCURRENCY} -sm "${DATE}"
+    docker run -v $(pwd)/client:/client --name 1mclient_$c -d alpine /client \
+    -conn=${CONNECTIONS} -ip=${IP}
 done

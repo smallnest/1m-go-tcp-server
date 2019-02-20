@@ -2,6 +2,8 @@
 
 REPLICAS=$1
 
+rm -f metrics.log 
+
 for (( c=0; c<${REPLICAS}; c++ ))
 do
     docker logs 1mclient_$c|egrep "mean|stddev"|tail -3 >> metrics.log
