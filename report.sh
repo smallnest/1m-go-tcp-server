@@ -10,3 +10,4 @@ do
 done
 
 grep "mean rate" metrics.log |awk '{s+=$5} END {print s}'
+grep "mean:" metrics.log |tr -d "ns"|awk '{s+=$4} END {if (NR > 0) printf("%dns\n",s/ NR)}'
