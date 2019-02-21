@@ -11,12 +11,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/libp2p/go-reuseport"
 	"github.com/rcrowley/go-metrics"
 )
 
 var (
-	iotime = flag.Duration("io", time.Duration(10*time.Millisecond), "sleep time")
+	c = flag.Int("c", 10, "concurrency")
 )
+
 var (
 	opsRate = metrics.NewRegisteredMeter("ops", nil)
 )
@@ -27,23 +29,31 @@ func main() {
 	setLimit()
 	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 
-	ln, err := net.Listen("tcp", ":8972")
-	if err != nil {
-		panic(err)
-	}
-
 	go func() {
 		if err := http.ListenAndServe(":6060", nil); err != nil {
 			log.Fatalf("pprof failed: %v", err)
 		}
 	}()
 
-	var connections []net.Conn
-	defer func() {
-		for _, conn := range connections {
-			conn.Close()
-		}
-	}()
+	for i := 0; i < *c; i++ {
+		go startEpoll()
+	}
+
+	select {}
+}
+
+func startEpoll() {
+	ln, err := reuseport.Listen("tcp", ":8972")
+	if err != nil {
+		panic(err)
+	}
+
+	epoller, err := MkEpoll()
+	if err != nil {
+		panic(err)
+	}
+
+	go start(epoller)
 
 	for {
 		conn, e := ln.Accept()
@@ -57,26 +67,37 @@ func main() {
 			return
 		}
 
-		go handleConn(conn)
-		connections = append(connections, conn)
-		if len(connections)%100 == 0 {
-			log.Printf("total number of connections: %v", len(connections))
+		if err := epoller.Add(conn); err != nil {
+			log.Printf("failed to add connection %v", err)
+			conn.Close()
 		}
 	}
 }
 
-func handleConn(conn net.Conn) {
+func start(epoller *epoll) {
 	for {
-		time.Sleep(*iotime)
-		_, err := io.CopyN(conn, conn, 8)
+		connections, err := epoller.Wait()
 		if err != nil {
-			log.Printf("failed to copy: %v", err)
-			conn.Close()
-			return
+			log.Printf("failed to epoll wait %v", err)
+			continue
 		}
-		opsRate.Mark(1)
-	}
+		for _, conn := range connections {
+			if conn == nil {
+				break
+			}
 
+			pow(6)
+			io.CopyN(conn, conn, 8)
+			if err != nil {
+				if err := epoller.Remove(conn); err != nil {
+					log.Printf("failed to remove %v", err)
+				}
+				conn.Close()
+			}
+
+			opsRate.Mark(1)
+		}
+	}
 }
 
 func setLimit() {
