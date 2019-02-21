@@ -17,7 +17,7 @@ import (
 
 var (
 	c      = flag.Int("c", 10, "concurrency")
-	target = flag.Int("pow", 6, "count of prefix zeros in target")
+	target = flag.Int("pow", 12, "count of prefix zeros in target")
 )
 
 var (
@@ -91,7 +91,7 @@ func start(epoller *epoll) {
 				break
 			}
 
-			pow(6)
+			pow(*target)
 			io.CopyN(conn, conn, 8)
 			if err != nil {
 				if err := epoller.Remove(conn); err != nil {
