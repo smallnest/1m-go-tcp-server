@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"io"
 	"log"
 	"net"
@@ -12,10 +11,6 @@ import (
 	"time"
 
 	"github.com/rcrowley/go-metrics"
-)
-
-var (
-	c = flag.Int("c", 10, "concurrency")
 )
 
 var (
