@@ -16,7 +16,8 @@ import (
 )
 
 var (
-	c = flag.Int("c", 10, "concurrency")
+	c      = flag.Int("c", 10, "concurrency")
+	target = flag.Int("pow", 6, "count of prefix zeros in target")
 )
 
 var (
@@ -28,6 +29,10 @@ func main() {
 
 	setLimit()
 	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
+
+	now := time.Now()
+	pow(*target)
+	log.Printf("pow took: %d ns", time.Since(now).Nanoseconds())
 
 	go func() {
 		if err := http.ListenAndServe(":6060", nil); err != nil {

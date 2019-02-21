@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/sha256"
-	"fmt"
 	"math/big"
 	"strconv"
 )
@@ -10,7 +9,6 @@ import (
 func pow(targetBits int) *big.Int {
 	target := big.NewInt(1)
 	target.Lsh(target, uint(256-targetBits))
-	fmt.Printf("%v\n", target)
 	var hashInt big.Int
 	var hash [32]byte
 	nonce := 0
