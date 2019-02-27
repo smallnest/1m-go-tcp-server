@@ -3,10 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net"
-	"os"
 	"syscall"
 	"time"
 )
@@ -14,15 +12,10 @@ import (
 var (
 	ip          = flag.String("ip", "127.0.0.1", "server IP")
 	connections = flag.Int("conn", 1, "number of tcp connections")
+	startMetric = flag.String("sm", time.Now().Format("2006-01-02T15:04:05 -0700"), "start time point of all clients")
 )
 
 func main() {
-	flag.Usage = func() {
-		io.WriteString(os.Stderr, `tcp客户端测试工具
-使用方法: ./client -ip=172.17.0.1 -conn=10
-`)
-		flag.PrintDefaults()
-	}
 	flag.Parse()
 
 	setLimit()
