@@ -1,5 +1,6 @@
 # Benchmark for implementation of servers that support 1m connections
 
+inspired by [handling 1M websockets connections in Go ](https://github.com/eranyanay/1m-go-websockets)
 
 ## Servers
 
