@@ -42,6 +42,7 @@ client sends the next request only when it has received the response. it has not
 
 | | throughputs (tps) | latency |
 |--|--|--|
+|goroutine-per-conn|202830|4.9s|
 |single epoll(both server and client)| 42495 | 23s|
 |single epoll server| 42402 | 0.8s|
 |multiple epoll server| 197814 | 0.9s|
