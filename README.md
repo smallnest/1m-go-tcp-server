@@ -20,7 +20,7 @@ inspired by [handling 1M websockets connections in Go ](https://github.com/erany
 	
 ## Test Environment
 
--two `E5-2630 V4` cpus, total **20** cores, **40** logicial cores.
+- two `E5-2630 V4` cpus, total **20** cores, **40** logicial cores.
 - 32G memory 
 
 tune the linux:
@@ -34,6 +34,8 @@ ulimit -n 2000500
 sysctl -w net.ipv4.tcp_tw_recycle=1
 sysctl -w net.ipv4.tcp_tw_reuse=1
 ```
+
+client sends the next request only when it has received the response. it has not used the `pipeline` style to test.
 ## Benchmarks
 
 ### 1m connections
