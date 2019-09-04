@@ -13,7 +13,7 @@ import (
 
 	"github.com/libp2p/go-reuseport"
 	"github.com/rcrowley/go-metrics"
-)
+) 
 
 var (
 	c      = flag.Int("c", 10, "concurrency")
@@ -88,7 +88,7 @@ func start(epoller *epoll) {
 			}
 
 			time.Sleep(*iotime)
-			io.CopyN(conn, conn, 8)
+			_, err = io.CopyN(conn, conn, 8)
 			if err != nil {
 				if err := epoller.Remove(conn); err != nil {
 					log.Printf("failed to remove %v", err)
