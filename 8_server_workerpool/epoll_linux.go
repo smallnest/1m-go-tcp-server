@@ -48,8 +48,12 @@ func (e *epoll) Add(conn net.Conn) error {
 
 func (e *epoll) Remove(conn net.Conn) error {
 	fd := socketFD(conn)
+rerty:
 	err := unix.EpollCtl(e.fd, syscall.EPOLL_CTL_DEL, fd, nil)
 	if err != nil {
+		if err == unix.EINTR {
+			goto retry
+		}
 		return err
 	}
 	e.lock.Lock()

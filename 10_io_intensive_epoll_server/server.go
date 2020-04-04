@@ -13,12 +13,12 @@ import (
 
 	"github.com/libp2p/go-reuseport"
 	"github.com/rcrowley/go-metrics"
-) 
+)
 
 var (
 	c      = flag.Int("c", 10, "concurrency")
 	iotime = flag.Duration("io", time.Duration(10*time.Millisecond), "sleep time")
-)
+) 
 
 var (
 	opsRate = metrics.NewRegisteredMeter("ops", nil)

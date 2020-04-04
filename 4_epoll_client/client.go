@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"syscall"
 	"time"
 
@@ -28,17 +27,17 @@ var epoller *epoll
 func main() {
 	flag.Parse()
 
-	setLimit()
+	// setLimit()
 
-	go func() {
-		startPoint, err := time.Parse("2006-01-02T15:04:05 -0700", *startMetric)
-		if err != nil {
-			panic(err)
-		}
-		time.Sleep(startPoint.Sub(time.Now()))
+	// go func() {
+	// 	startPoint, err := time.Parse("2006-01-02T15:04:05 -0700", *startMetric)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	time.Sleep(startPoint.Sub(time.Now()))
 
-		metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
-	}()
+	// 	metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
+	// }()
 
 	var err error
 	epoller, err = MkEpoll()

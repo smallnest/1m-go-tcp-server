@@ -28,7 +28,7 @@ var (
 func main() {
 	flag.Parse()
 
-	setLimit()
+	//setLimit()
 	go func() {
 		startPoint, _ := time.Parse("2006-01-02T15:04:05 -0700", *startMetric)
 		time.Sleep(startPoint.Sub(time.Now()))

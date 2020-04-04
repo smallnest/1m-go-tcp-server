@@ -63,8 +63,12 @@ func (e *epoll) Remove(conn net.Conn) error {
 
 func (e *epoll) Wait() ([]net.Conn, error) {
 	events := make([]unix.EpollEvent, 100)
+retry:
 	n, err := unix.EpollWait(e.fd, events, 100)
 	if err != nil {
+		if err == unix.EINTR {
+			goto retry
+		}
 		return nil, err
 	}
 	e.lock.RLock()
